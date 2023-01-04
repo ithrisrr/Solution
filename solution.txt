@@ -1,0 +1,156 @@
+const blocks = [
+    {
+        "gym":false,
+        "school":true,
+        "store":false
+    },
+    {
+        "gym":true,
+        "school":false,
+        "store":false
+    },
+    {
+        "gym":true,
+        "school":true,
+        "store":false
+    },
+    {
+        "gym":false,
+        "school":true,
+        "store":false
+    },
+    {
+        "gym":false,
+        "school":true,
+        "store":true
+    }
+
+];
+    
+var reqs =["gym","school","store"]
+
+function apartmentHunting(blocks, reqs) {
+
+    var soln = {}
+    //Loop For Each Block 
+    for (var index = 0; index < blocks.length; index++) {
+        // Get No Of Move to Get All Req From Current Block
+        var moves = getNoOFMoves(index,blocks,reqs);
+        //Store No Of Moves To Object 
+        soln[index] = moves;  
+    }
+    
+    var finalOutput = {}
+    var Keys = Object.keys(soln);
+
+    //Loop To Group The Blocks By Moves 
+    for(var key of Keys){
+        var value = soln[key];
+        if (finalOutput[value]) {
+            var arr = finalOutput[value];
+            arr.push(key);
+            finalOutput[value] = arr;
+        }else{
+            var arr = []
+            arr.push(key);
+            finalOutput[value] = arr;
+        }
+    }
+
+    var keys = Object.keys(finalOutput)
+    console.log(finalOutput[keys[0]][0])
+}
+    
+function getNoOFMoves(_index,blocks,req) {
+    var res ;
+
+    //Claculate No OF Moves From top To Current Blocks If All Requirements Are Fulfilled
+    var uprequests = [...req];
+    var upmove = -1;
+    for (var index = _index; index >= 0; index--) {
+        if(uprequests.length <= 0){
+            break;
+        }else{
+            for (let r of req) {
+                if(blocks[index][r]){
+                    var rindex = uprequests.indexOf(r);
+                    if(rindex >= 0){
+                        uprequests.splice(rindex,1);
+                    }
+                }
+            }
+        }
+        upmove++;
+    }
+
+
+    //Claculate No OF Moves From  current Blocks to Last Block If All Requirements Are Fulfilled
+        var downrequests = [...req];
+        var downmove = -1;
+        for (var index = _index; index < blocks.length; index++) {
+        if(downrequests.length <= 0){
+            break;
+        }else{
+            for (let r of req) {
+                if(blocks[index][r]){
+                    var rindex = downrequests.indexOf(r);
+                    if(rindex >= 0){
+                        downrequests.splice(rindex,1);
+                    }
+                }
+            }
+        }
+        downmove++;
+    }
+
+
+    //Claculate No OF Moves From Above & Below OF Current Block If All Requirements Are Fulfilled
+    if (index != 0 && index != blocks.length -1) {
+        var a = [_index , _index -1,_index+1];
+        var move = 0;
+        var requests = [...req]
+        for (let index of a) {
+            if (requests.length <= 0) {
+            break;        
+        }else{
+            for (let r of req) {
+                if(blocks[index] != null && blocks[index][r]){
+                    var rindex = requests.indexOf(r);
+                    if(rindex >= 0){
+                    requests.splice(rindex,1);
+                }
+            }
+        }   
+    }
+    move++;
+    }
+    }
+    move--;
+
+
+    //Checks For Which Has Smaller No Of Moves [Up/Down/(Above & Below)] 
+    if (uprequests.length == 0 && downrequests.length == 0 && requests.length == 0) {
+        res = upmove < downmove ? upmove : downmove < upmove ? downmove : move;
+    }else if (requests.length == 0 && downrequests.length == 0 ) {
+        res = move < downmove ? move : downmove;
+    }else if (downrequests.length == 0 && uprequests.length == 0) {
+        res = downmove < upmove ? downmove : upmove;;
+    }else if (uprequests.length == 0 && requests.length == 0) {
+        res = upmove < move ? upmove : move;
+    }else if(uprequests.length == 0){
+        res = upmove;
+    }else if(downrequests.length == 0){
+        res = downmove;
+    }else if (requests.length == 0) {
+        res = move -1;
+    }
+
+    return res;
+
+}
+
+apartmentHunting(blocks, reqs)
+
+// Do not edit the line below.
+
+exports.apartmentHunting = apartmentHunting;
